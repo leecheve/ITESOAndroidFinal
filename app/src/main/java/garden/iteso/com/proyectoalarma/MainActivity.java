@@ -137,31 +137,6 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Start ringing the alert
-    public void ring(View v) {
-        SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        String stringValue = preferences.getString("alerts_ringtone", "");
-
-        if (ringtone != null && ringtone.isPlaying()) {
-            ringtone.stop();
-        } else {
-            ringtone = RingtoneManager.getRingtone(this, Uri.parse(stringValue));
-            ringtone.play();
-        }
-    }
-
-    public void vibrate(View v) {
-        Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        if (vibrator.hasVibrator()) {
-            long[] pattern = {0, 200, 100, 200, 100, 200, 100, 200, 100};
-            vibrator.vibrate(pattern, -1);
-        }
-
-        // vibrator.cancel(); // stop vibrating
-    }
-
     public void flash(View v) {
             texto.append("Number of cameras: " + Camera.getNumberOfCameras() + "\n");
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -194,36 +169,6 @@ public class MainActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
         //camera.getParameters().setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-    }
-
-    public void noti(View v) {
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
-
-        long[] vibPattern = {0, 100, 100, 100, 100, 100, 100, 100, 100, 500};
-
-        mBuilder.setSmallIcon(R.drawable.ic_launcher);
-        mBuilder.setContentTitle("Alert: Movement Detected!");
-        mBuilder.setContentText("Sensor triggered.");
-        mBuilder.setTicker("Movement Sensor Alert!");
-        mBuilder.setNumber(++numMessages);
-        mBuilder.setVibrate(vibPattern);
-        mBuilder.setAutoCancel(true);
-
-
-        Intent resultIntent = new Intent(this, MainActivity.class);
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(MainActivity.class);
-
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        mNotificationManager.notify(1, mBuilder.build());
     }
 
     /*
@@ -292,7 +237,7 @@ public class MainActivity extends ActionBarActivity {
             return "";
         }
 
-        texto.append("Registration ID: " + registrationId);
+        texto.append("Registration ID: " + registrationId + "\n");
         Log.e("LUIS", registrationId);
         return registrationId;
     }
@@ -315,13 +260,8 @@ public class MainActivity extends ActionBarActivity {
                     regid = gcm.register(SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
 
-                    // You should send the registration ID to your server over HTTP, so it
-                    // can use GCM/HTTP or CCS to send messages to your app.
+                    // This should register the device with my Node JS server.
                     sendRegistrationIdToBackend();
-
-                    // For this demo: we don't need to send it because the device will send
-                    // upstream messages to a server that echo back the message using the
-                    // 'from' address in the message.
 
                     // Persist the regID - no need to register again.
                     storeRegistrationId(context, regid);
@@ -369,6 +309,7 @@ public class MainActivity extends ActionBarActivity {
      * to a server that echoes back the message using the 'from' address in the message.
      */
     private void sendRegistrationIdToBackend() {
+        // But it does nothing..
         texto.append("Send to backend server: " + regid);
     }
 

@@ -13,27 +13,9 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ring"
-            android:textAllCaps="false"
-            android:onClick="ring"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vib"
-            android:textAllCaps="false"
-            android:onClick="vibrate"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="Flash"
             android:textAllCaps="false"
             android:onClick="flash"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notif"
-            android:textAllCaps="false"
-            android:onClick="noti"/>
     </LinearLayout>
     <TextView
         android:id="@+id/text"
