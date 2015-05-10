@@ -1,0 +1,44 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_header_alerts_control">
+        <SwitchPreference
+            android:key="global_alerts_checkbox"
+            android:title="@string/pref_title_global_alerts"
+            android:summary="@string/pref_description_global_alerts"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="temporal_alerts_list"
+            android:dependency="global_alerts_checkbox"
+            android:title="@string/pref_title_temporary_alerts"
+            android:defaultValue="-1"
+            android:entries="@array/pref_temporal_alerts_titles"
+            android:entryValues="@array/pref_temporary_alerts_values"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_header_alerts_types"
+        android:dependency="global_alerts_checkbox">
+        <CheckBoxPreference
+            android:key="alert_flash_checkbox"
+            android:title="@string/alert_flash_checkbox"/>
+        <CheckBoxPreference
+            android:key="alert_vibrate_checkbox"
+            android:title="@string/alert_vibrate_checkbox"/>
+        <RingtonePreference
+            android:key="alerts_ringtone"
+            android:title="@string/pref_title_ringtone"
+            android:ringtoneType="alarm"
+            android:defaultValue="content://settings/system/notification_sound" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_header_sensor">
+        <Preference
+            android:key="setSensorLocation"
+            android:title="@string/pref_title_sensor_location">
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

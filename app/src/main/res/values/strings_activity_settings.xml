@@ -1,0 +1,42 @@
+<resources>
+    <string name="title_activity_settings">Alerts Configuration</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_header_alerts_control">Alerts Control</string>
+
+    <string name="pref_title_global_alerts">Enable Alerts</string>
+    <string name="pref_description_global_alerts">Enables or disables all the alerts
+    </string>
+
+    <string name="pref_title_temporary_alerts">Temporary Disable Alerts</string>
+    <string-array name="pref_temporal_alerts_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_temporary_alerts_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <!-- Alert types -->
+    <string name="pref_header_alerts_types">Alert Types</string>
+    <string name="alert_sound_checkbox">Sound</string>
+    <string name="alert_flash_checkbox">Flash</string>
+    <string name="alert_vibrate_checkbox">Vibrate</string>
+
+    <string name="pref_title_ringtone">Ringtone</string>
+    <string name="pref_ringtone_silent">Silent</string>
+
+    <!-- Sensor Location -->
+    <string name="pref_header_sensor">Movement Sensor</string>
+    <string name="pref_title_sensor_location">Set Sensor Location</string>
+
+</resources>
