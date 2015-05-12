@@ -18,6 +18,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.media.AudioAttributes;
+import android.media.Image;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -33,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -62,6 +65,9 @@ public class MainActivity extends ActionBarActivity {
     // Number of notifications received
     private int numMessages = 0;
 
+    // red or green cloud that checks if there is internet or not
+    ImageView statusCloud;
+
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -73,7 +79,7 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Tag used on log messages.
      */
-    static final String TAG = "GCM Demo";
+    static final String TAG = "LUIS";
 
     TextView texto;
     GoogleCloudMessaging gcm;
@@ -88,8 +94,11 @@ public class MainActivity extends ActionBarActivity {
         context = getApplicationContext();
         texto = (TextView) findViewById(R.id.text);
 
+        statusCloud = (ImageView) findViewById(R.id.status_cloud);
+
         // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
         if (checkPlayServices()) {
+            Log.i(TAG, "Play Services OK");
             gcm = GoogleCloudMessaging.getInstance(this);
             regid = getRegistrationId(context);
 
@@ -107,9 +116,12 @@ public class MainActivity extends ActionBarActivity {
 
         // Check device for Play Services APK.
         checkPlayServices();
+
+        // this will change the cloud to red or green depending on internet connectivity
+        checkInternetAvailable();
+
         NotificationManager mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
-        //mNotificationManager.cancel(1);
     }
 
     @Override
@@ -180,6 +192,7 @@ public class MainActivity extends ActionBarActivity {
      * the Google Play Store or enable it in the device's system settings.
      */
     private boolean checkPlayServices() {
+
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
@@ -189,9 +202,11 @@ public class MainActivity extends ActionBarActivity {
                 Log.i(TAG, "This device is not supported.");
                 finish();
             }
+            statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_red));
             return false;
         }
         texto.append("checkPlayServices OK\n");
+        statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_green));
         return true;
     }
 
@@ -249,6 +264,7 @@ public class MainActivity extends ActionBarActivity {
      * shared preferences.
      */
     private void registerInBackground() {
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -257,8 +273,10 @@ public class MainActivity extends ActionBarActivity {
                     if (gcm == null) {
                         gcm = GoogleCloudMessaging.getInstance(context);
                     }
+
                     regid = gcm.register(SENDER_ID);
                     msg = "Device registered, registration ID=" + regid;
+                    Log.i(TAG, msg);
 
                     // This should register the device with my Node JS server.
                     sendRegistrationIdToBackend();
@@ -310,7 +328,33 @@ public class MainActivity extends ActionBarActivity {
      */
     private void sendRegistrationIdToBackend() {
         // But it does nothing..
-        texto.append("Send to backend server: " + regid);
     }
 
+    private void checkInternetAvailable() {
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    InetAddress ipAddr = InetAddress.getByName("google.com");
+
+                    if (ipAddr.equals("")) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+            @Override
+            protected void onPostExecute(Boolean available) {
+                texto.append("Internet Available: " + Boolean.toString(available) + "\n");
+                if (!available)
+                    statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_red));
+                else
+                    statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_green));
+            }
+        }.execute(null, null, null);
+    }
 }
