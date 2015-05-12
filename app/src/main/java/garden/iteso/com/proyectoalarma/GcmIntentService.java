@@ -8,17 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -26,16 +20,13 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
  * Created by luisneto on 5/10/2015.
  */
 public class GcmIntentService extends IntentService {
-    private Ringtone ringtone;
-
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
 
     public GcmIntentService() {
         super("GcmIntentService");
     }
-    public static final String TAG = "GCM Demo";
+    public static final String TAG = "LUIS";
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -65,8 +56,7 @@ public class GcmIntentService extends IntentService {
     }
 
     // Put the message into a notification and post it.
-    // This is just one simple example of what you might choose to do with
-    // a GCM message.
+    // lots of checks are done from Settings (vibrate, led, sound, global alerts)
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -97,7 +87,7 @@ public class GcmIntentService extends IntentService {
         if (doVibrate)
             mBuilder.setVibrate(vibPattern);
 
-        mBuilder.setContentIntent(contentIntent);
+        //mBuilder.setContentIntent(contentIntent);
 
         Notification mNotification = mBuilder.build();
         mNotification.flags |= Notification.FLAG_INSISTENT;

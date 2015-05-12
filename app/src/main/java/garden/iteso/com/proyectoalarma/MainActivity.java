@@ -1,6 +1,5 @@
 package garden.iteso.com.proyectoalarma;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,11 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
-import android.media.Ringtone;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -20,7 +14,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,23 +23,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.concurrent.atomic.AtomicInteger;
 
-/*
-    NOTAS:
-    - SharedPreferences esta en los slides de la sesion 8
 
-    TODO:
-    - Tengo que hacer un shared preferences change listener en esta actividad?
-    - Flash it out!
-
- */
 public class MainActivity extends ActionBarActivity {
-    // Ringtone object from RingtoneManager to start ringing on alert
-    private Ringtone ringtone;
-    // Camera object to turn flash on
-    private Camera camera;
-
     // default shared preferences, settings are stored here
     SharedPreferences sharedPreferences;
 
@@ -148,40 +127,6 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void flash(View v) {
-            texto.append("Number of cameras: " + Camera.getNumberOfCameras() + "\n");
-            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-
-            if (camera != null) {
-                camera.stopPreview();
-                camera.release();
-                texto.append("Camera 0 stop and release\n");
-                camera = null;
-                return;
-            }
-
-            try {
-                camera = Camera.open(0);
-                texto.append("Camera 0 opened\n");
-                Camera.Parameters parameters = camera.getParameters();
-                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                camera.setParameters(parameters);
-
-                try {
-                    camera.setPreviewTexture(new SurfaceTexture(0));
-                } catch (IOException i) {
-                    Log.e("Camera IO Error: ", i.getMessage());
-                }
-                camera.startPreview();
-                texto.append("Camera 0 startPreview\n");
-
-            } catch (RuntimeException e) {
-                Log.e("Camera Error: ", e.getMessage());
-                e.printStackTrace();
-            }
-        //camera.getParameters().setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
     }
 
     /*
@@ -328,9 +273,10 @@ public class MainActivity extends ActionBarActivity {
      * to a server that echoes back the message using the 'from' address in the message.
      */
     private void sendRegistrationIdToBackend() {
-        // But it does nothing..
+        // But it does nothing...
     }
 
+    // checking of internet is done in an AsyncTask to avoid any network on main activity exception
     private void checkInternetAvailable() {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
@@ -348,6 +294,8 @@ public class MainActivity extends ActionBarActivity {
                     return false;
                 }
             }
+
+            // Set the cloud icon according to Internet availability
             @Override
             protected void onPostExecute(Boolean available) {
                 texto.append("Internet Available: " + Boolean.toString(available) + "\n");
