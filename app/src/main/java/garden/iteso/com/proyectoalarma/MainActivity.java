@@ -1,48 +1,32 @@
 package garden.iteso.com.proyectoalarma;
 
-import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CaptureRequest;
-import android.media.AudioAttributes;
-import android.media.Image;
 import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -62,8 +46,9 @@ public class MainActivity extends ActionBarActivity {
     private Ringtone ringtone;
     // Camera object to turn flash on
     private Camera camera;
-    // Number of notifications received
-    private int numMessages = 0;
+
+    // default shared preferences, settings are stored here
+    SharedPreferences sharedPreferences;
 
     // red or green cloud that checks if there is internet or not
     ImageView statusCloud;
@@ -83,7 +68,6 @@ public class MainActivity extends ActionBarActivity {
 
     TextView texto;
     GoogleCloudMessaging gcm;
-    AtomicInteger msgId = new AtomicInteger();
     Context context;
 
     @Override
@@ -92,6 +76,11 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         context = getApplicationContext();
+
+        // get the default shared preferences, settings are stored here.
+        sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+
         texto = (TextView) findViewById(R.id.text);
 
         statusCloud = (ImageView) findViewById(R.id.status_cloud);
@@ -108,6 +97,12 @@ public class MainActivity extends ActionBarActivity {
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
         }
+
+        registerReceiver(new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                checkInternetAvailable();
+            }
+        }, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
     }
 
     @Override
@@ -120,8 +115,14 @@ public class MainActivity extends ActionBarActivity {
         // this will change the cloud to red or green depending on internet connectivity
         checkInternetAvailable();
 
-        NotificationManager mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
+        // Show debug info, check if enabled in settings using shared preferences
+        boolean showDebug = sharedPreferences.getBoolean("showDebugInformation", false);
+        Log.i(TAG, "Show debug info: " + Boolean.toString(showDebug));
+
+        if (showDebug)
+            texto.setVisibility(TextView.VISIBLE);
+        else
+            texto.setVisibility(TextView.INVISIBLE);
     }
 
     @Override
@@ -350,10 +351,14 @@ public class MainActivity extends ActionBarActivity {
             @Override
             protected void onPostExecute(Boolean available) {
                 texto.append("Internet Available: " + Boolean.toString(available) + "\n");
-                if (!available)
+                if (!available) {
+                    Log.i("LUIS", "There is no Internet!");
                     statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_red));
-                else
+                }
+                else {
+                    Log.i("LUIS", "Internet is good!");
                     statusCloud.setImageDrawable(getResources().getDrawable(R.drawable.cloud_green));
+                }
             }
         }.execute(null, null, null);
     }

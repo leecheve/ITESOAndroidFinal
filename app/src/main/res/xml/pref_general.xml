@@ -40,5 +40,12 @@
             android:title="@string/pref_title_sensor_location">
         </Preference>
     </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_header_debug">
+    <SwitchPreference
+        android:key="showDebugInformation"
+        android:title="@string/pref_title_debug_information">
+    </SwitchPreference>
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -39,4 +39,8 @@
     <string name="pref_header_sensor">Movement Sensor</string>
     <string name="pref_title_sensor_location">Set Sensor Location</string>
 
+    <!-- Debug information -->
+    <string name="pref_header_debug">Debug</string>
+    <string name="pref_title_debug_information">Show Debug Information</string>
+
 </resources>
